@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新能源拍卖平台导航</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans SC',system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;padding:20px}
+  .wrap{max-width:1300px;margin:0 auto}
+  .header{display:flex;align-items:baseline;gap:16px;margin-bottom:18px}
+  .header h1{font-size:16px;font-weight:500;color:#1a1a1a}
+  .header-meta{font-size:12px;color:#888;margin-left:auto}
+  .top-bar{display:flex;gap:10px;margin-bottom:18px;align-items:center}
+  .search{flex:1;height:34px;border:1px solid #ddd;border-radius:5px;padding:0 12px;font-size:13px;background:#fff;font-family:inherit;outline:none;color:#1a1a1a}
+  .search:focus{border-color:#999}
+  .btn{height:34px;padding:0 14px;border:1px solid #ddd;border-radius:5px;background:#fff;font-size:12px;color:#555;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .1s}
+  .btn:hover{background:#f0f0f0}
+  .layout{display:flex;gap:18px;align-items:flex-start}
+  .main{flex:1;min-width:0}
+  .sidebar{width:230px;flex-shrink:0;position:sticky;top:20px}
+  /* sections */
+  .section{margin-bottom:20px}
+  .sec-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .sec-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em}
+  .sec-btn{margin-left:auto;font-size:11px;color:#888;background:none;border:1px solid #ddd;border-radius:4px;padding:2px 9px;cursor:pointer;font-family:inherit}
+  .sec-btn:hover{background:#f0f0f0;color:#333}
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}
+  .card{background:#fff;border:1px solid #e5e5e5;border-radius:6px;padding:10px 12px;text-decoration:none;display:flex;flex-direction:column;gap:3px;transition:border-color .15s,box-shadow .15s;position:relative}
+  .card:hover{border-color:#bbb;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  .card.hidden{display:none}
+  .card-name{font-size:13px;font-weight:500;color:#1a1a1a;line-height:1.3;padding-right:20px}
+  .card-url{font-size:10px;color:#aaa;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card-note{font-size:11px;color:#888}
+  .card-foot{display:flex;align-items:center;gap:6px;margin-top:2px}
+  .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .d-j{background:#e06060}.d-p{background:#5b8ecf}.d-g{background:#5aab6e}.d-v{background:#d4913a}
+  .stars{position:absolute;top:8px;right:10px;font-size:9px;color:#ccc;letter-spacing:-1px}
+  .card-tags{display:flex;gap:3px;flex-wrap:wrap}
+  .tag{font-size:9px;padding:1px 5px;border-radius:3px;background:#f0f0f0;color:#666}
+  /* kw panel */
+  .kw-panel{background:#fff;border:1px solid #e5e5e5;border-radius:6px;overflow:hidden}
+  .kw-hd{padding:9px 12px;border-bottom:1px solid #eee;font-size:11px;font-weight:500;color:#888;letter-spacing:.05em;text-transform:uppercase}
+  .kw-g{padding:9px 12px;border-bottom:1px solid #eee}
+  .kw-g:last-child{border-bottom:none}
+  .kw-gt{font-size:10px;font-weight:500;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+  .kw-pills{display:flex;flex-wrap:wrap;gap:3px}
+  .kw-pill{font-size:11px;padding:2px 7px;border-radius:4px;background:#f5f5f3;border:1px solid #e5e5e5;color:#444;cursor:default;white-space:nowrap}
+  .kw-pill.neg{text-decoration:line-through;color:#bbb}
+  .kw-note{font-size:11px;color:#777;line-height:1.8}
+  .kw-note b{color:#444;font-weight:500}
+  @media(max-width:860px){.layout{flex-direction:column}.sidebar{width:100%;position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <h1>新能源拍卖平台导航</h1>
+  <div class="header-meta">46个平台 &nbsp;·&nbsp; 验证 2026-03-17 &nbsp;·&nbsp; <span id="dt"></span></div>
+</div>
+
+<div class="top-bar">
+  <input class="search" type="text" placeholder="搜索平台名称..." oninput="filter(this.value)" id="q">
+  <button class="btn" onclick="openSec('all')">全部打开 ↗</button>
+</div>
+
+<div class="layout">
+<div class="main">
+
+<div class="section">
+  <div class="sec-hd">
+    <span class="dot d-j"></span>
+    <span class="sec-title">司法 / 综合拍卖</span>
+    <button class="sec-btn" onclick="openSec('judicial')">打开本组 ↗</button>
+  </div>
+  <div class="grid" id="judicial">
+    <a class="card" href="https://paimai.caa123.org.cn" target="_blank" data-n="中拍平台 caa123"><div class="stars">★★★</div><div class="card-name">中拍平台</div><div class="card-url">paimai.caa123.org.cn</div><div class="card-foot"><span class="dot d-j"></span><span class="card-note">拍卖行业协会主办</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://zc-paimai.taobao.com/wow/pm/default/pc/zichansearch?keyword=动力电池" target="_blank" data-n="阿里资产 taobao"><div class="stars">★★★</div><div class="card-name">阿里资产</div><div class="card-url">zc-paimai.taobao.com</div><div class="card-foot"><span class="dot d-j"></span><span class="card-note">司法处置，流量最大</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">整车</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://auction.jd.com" target="_blank" data-n="京东拍卖 jd auction"><div class="stars">★★★</div><div class="card-name">京东拍卖</div><div class="card-url">auction.jd.com</div><div class="card-foot"><span class="dot d-j"></span><span class="card-note">司法拍卖，车源丰富</span></div><div class="card-tags"><span class="tag">整车</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://www.gpai.net" target="_blank" data-n="公拍网 gpai"><div class="stars">★★</div><div class="card-name">公拍网</div><div class="card-url">gpai.net</div><div class="card-foot"><span class="dot d-j"></span><span class="card-note">上海司法拍卖</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.rmfysszc.gov.cn" target="_blank" data-n="人民法院诉讼资产网"><div class="stars">★★</div><div class="card-name">人民法院诉讼资产网</div><div class="card-url">rmfysszc.gov.cn</div><div class="card-foot"><span class="dot d-j"></span><span class="card-note">最高法官方平台</span></div><div class="card-tags"><span class="tag">整车</span><span class="tag">公交</span></div></a>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hd">
+    <span class="dot d-p"></span>
+    <span class="sec-title">产权交易所（国资/央企）</span>
+    <button class="sec-btn" onclick="openSec('property')">打开本组 ↗</button>
+  </div>
+  <div class="grid" id="property">
+    <a class="card" href="https://www.cbex.com.cn/qwjs/?total=动力电池" target="_blank" data-n="北京产权交易所 cbex"><div class="stars">★★★</div><div class="card-name">北京产权交易所</div><div class="card-url">cbex.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">央企产权交易核心</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://otc.cbex.com" target="_blank" data-n="北交互联 otc.cbex"><div class="stars">★★</div><div class="card-name">北交互联</div><div class="card-url">otc.cbex.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">北交所网络竞价</span></div><div class="card-tags"><span class="tag">电池</span></div></a>
+    <a class="card" href="https://new.gemas.com.cn/trade?subjectType=gz_fjdc" target="_blank" data-n="广州产权交易所 gemas"><div class="stars">★★★</div><div class="card-name">广州产权交易所</div><div class="card-url">new.gemas.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">废旧电池专栏</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://new.csuaee.com.cn/home.html" target="_blank" data-n="南方联合产权交易中心 csuaee"><div class="stars">★★★</div><div class="card-name">南方联合产权交易中心</div><div class="card-url">new.csuaee.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">2025年新系统</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://www.sotcbb.com/xmgg.jhtml?id=xmggzczrzspl" target="_blank" data-n="深圳联合产权交易所 sotcbb"><div class="stars">★★★</div><div class="card-name">深圳联合产权交易所</div><div class="card-url">sotcbb.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">深圳国资资产交易</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://www.cquae.com/search/so.cshtml?key=动力电池" target="_blank" data-n="重庆联合产权交易所 cquae"><div class="stars">★★</div><div class="card-name">重庆联合产权交易所</div><div class="card-url">cquae.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">全国最大省级平台之一</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://www.swuee.com/#/project?q=动力电池" target="_blank" data-n="西南联合产权交易所 swuee"><div class="stars">★★</div><div class="card-name">西南联合产权交易所</div><div class="card-url">swuee.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">四川、西藏等区域</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://www.haee.com.cn/search/fullsearch.html?wd=动力电池" target="_blank" data-n="合肥产权交易中心 haee"><div class="stars">★★</div><div class="card-name">合肥产权交易中心</div><div class="card-url">haee.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">废旧设备专栏活跃</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://www.sxcqjy.cn/home.html" target="_blank" data-n="山西省产权交易中心 sxcqjy"><div class="stars">★★</div><div class="card-name">山西省产权交易中心</div><div class="card-url">sxcqjy.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">山西区域</span></div><div class="card-tags"><span class="tag">电池</span></div></a>
+    <a class="card" href="https://otc.ovupre.com" target="_blank" data-n="武汉光谷联合产权 ovupre"><div class="stars">★★</div><div class="card-name">武汉光谷联合产权</div><div class="card-url">otc.ovupre.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">湖北区域</span></div><div class="card-tags"><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.aaee.com.cn/xmzx.html#/recommend" target="_blank" data-n="安徽省联合产权交易所 aaee"><div class="stars">★★</div><div class="card-name">安徽省联合产权交易所</div><div class="card-url">aaee.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">安徽区域</span></div><div class="card-tags"><span class="tag">整车</span><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.tpre.cn/psearch.thtml?keyword=废旧电池&dateType=all&projectPage=1" target="_blank" data-n="天津产权交易中心 tpre"><div class="stars">★★</div><div class="card-name">天津产权交易中心</div><div class="card-url">tpre.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">天津区域</span></div><div class="card-tags"><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.zjpse.com/page/project_li?q=动力电池&type=0" target="_blank" data-n="浙江省产权交易所 zjpse"><div class="stars">★★</div><div class="card-name">浙江省产权交易所</div><div class="card-url">zjpse.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">浙交汇平台</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://www.ejy365.com/jygg_more?keyword=动力电池" target="_blank" data-n="e交易产权交易平台 ejy365"><div class="stars">★★</div><div class="card-name">e交易产权交易平台</div><div class="card-url">ejy365.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">汇集全国产权交易所</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://www.cscqjy.com.cn/zhongyaogonggao/guapaigonggao" target="_blank" data-n="长沙产权交易所 cscqjy"><div class="stars">★</div><div class="card-name">长沙产权交易所</div><div class="card-url">cscqjy.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">湖南区域</span></div><div class="card-tags"><span class="tag">公交</span></div></a>
+    <a class="card" href="https://new.gduaee.com" target="_blank" data-n="广东联合产权交易中心 gduaee"><div class="stars">★</div><div class="card-name">广东联合产权交易中心</div><div class="card-url">new.gduaee.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">2025年8月新系统</span></div><div class="card-tags"><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.fjcqjy.com/html/list-content-L37982DL164L39HTZ112.html" target="_blank" data-n="福建省产权交易中心 fjcqjy"><div class="stars">★</div><div class="card-name">福建省产权交易中心</div><div class="card-url">fjcqjy.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">福建区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.gxcq.com.cn" target="_blank" data-n="广西联合产权交易所 gxcq"><div class="stars">★</div><div class="card-name">广西联合产权交易所</div><div class="card-url">gxcq.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">广西区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.prechina.net/project/index.php?class2=9" target="_blank" data-n="中国产权网 prechina"><div class="stars">★</div><div class="card-name">中国产权网</div><div class="card-url">prechina.net</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">贵州区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://jxcq.jxggzyjy.cn" target="_blank" data-n="江西省产权交易所 jxcq"><div class="stars">★</div><div class="card-name">江西省产权交易所</div><div class="card-url">jxcq.jxggzyjy.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">江西区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.sprtc.com/gghz1/xmgg.htm" target="_blank" data-n="上海物权流转平台 sprtc"><div class="stars">★</div><div class="card-name">上海物权流转平台</div><div class="card-url">sprtc.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">辽宁区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.gscq.com.cn" target="_blank" data-n="甘肃省产权交易所 gscq"><div class="stars">★</div><div class="card-name">甘肃省产权交易所</div><div class="card-url">gscq.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">甘肃区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.nmcqjy.com" target="_blank" data-n="内蒙古产权交易所 nmcqjy"><div class="stars">★</div><div class="card-name">内蒙古产权交易所</div><div class="card-url">nmcqjy.com</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">内蒙古区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://www.jscq.com.cn" target="_blank" data-n="江苏省产权交易所 jscq"><div class="stars">★</div><div class="card-name">江苏省产权交易所</div><div class="card-url">jscq.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">江苏区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://qhcqjy.com.cn" target="_blank" data-n="青海省产权交易市场 qhcqjy"><div class="stars">★</div><div class="card-name">青海省产权交易市场</div><div class="card-url">qhcqjy.com.cn</div><div class="card-foot"><span class="dot d-p"></span><span class="card-note">青海区域</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hd">
+    <span class="dot d-g"></span>
+    <span class="sec-title">公共资源交易中心</span>
+    <button class="sec-btn" onclick="openSec('gov')">打开本组 ↗</button>
+  </div>
+  <div class="grid" id="gov">
+    <a class="card" href="https://ggzy.hefei.gov.cn/search/fullsearch.html?wd=动力电池&lanmu=" target="_blank" data-n="合肥公共资源交易中心 ggzy hefei"><div class="stars">★★★</div><div class="card-name">合肥公共资源交易中心</div><div class="card-url">ggzy.hefei.gov.cn</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">动力电池拍卖活跃</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://www.ggzy.gov.cn" target="_blank" data-n="全国公共资源交易平台 ggzy.gov.cn"><div class="stars">★★★</div><div class="card-name">全国公共资源交易平台</div><div class="card-url">ggzy.gov.cn</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">国家级，汇集各地信息</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://jnggzy.jinan.gov.cn" target="_blank" data-n="济南公共资源交易中心 jnggzy jinan"><div class="stars">★★</div><div class="card-name">济南公共资源交易中心</div><div class="card-url">jnggzy.jinan.gov.cn</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">公交电池处置多</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://kfsggzyjyw.cn" target="_blank" data-n="开封公共资源交易 kfsggzyjyw"><div class="stars">★★</div><div class="card-name">开封公共资源交易</div><div class="card-url">kfsggzyjyw.cn</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">公交电池处置</span></div><div class="card-tags"><span class="tag">公交</span><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.haee.com.cn/fjsbjyzl/014002/fjsbjjnew.html" target="_blank" data-n="合肥产权废旧设备专栏 haee fjsb"><div class="stars">★★</div><div class="card-name">合肥产权·废旧设备专栏</div><div class="card-url">haee.com.cn/fjsbjyzl</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">固定列表，无需搜索</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://ggzy.beijing.gov.cn" target="_blank" data-n="北京公共资源交易平台 ggzy beijing"><div class="stars">★</div><div class="card-name">北京公共资源交易平台</div><div class="card-url">ggzy.beijing.gov.cn</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">北京地区</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://shggzy.com" target="_blank" data-n="上海公共资源交易中心 shggzy"><div class="stars">★</div><div class="card-name">上海公共资源交易中心</div><div class="card-url">shggzy.com</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">上海地区</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+    <a class="card" href="https://ggzyjy.sc.gov.cn" target="_blank" data-n="四川公共资源交易 ggzyjy sc"><div class="stars">★</div><div class="card-name">四川公共资源交易</div><div class="card-url">ggzyjy.sc.gov.cn</div><div class="card-foot"><span class="dot d-g"></span><span class="card-note">四川地区</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hd">
+    <span class="dot d-v"></span>
+    <span class="sec-title">垂直行业平台</span>
+    <button class="sec-btn" onclick="openSec('vertical')">打开本组 ↗</button>
+  </div>
+  <div class="grid" id="vertical">
+    <a class="card" href="https://dianchipaimai.com/#/biddingProject" target="_blank" data-n="电池之家拍卖网 dianchipaimai"><div class="stars">★★★</div><div class="card-name">电池之家拍卖网</div><div class="card-url">dianchipaimai.com</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">电池专业拍卖平台</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://ebid.chinatowercom.cn/zgtt/gggs/subpage.html" target="_blank" data-n="中国铁塔电子采购平台 chinatower"><div class="stars">★★★</div><div class="card-name">中国铁塔电子采购平台</div><div class="card-url">ebid.chinatowercom.cn</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">铁塔退役磷酸铁锂电池</span></div><div class="card-tags"><span class="tag">电池</span><span class="tag">废料</span></div></a>
+    <a class="card" href="https://paimai.xiaoyihuanbao.com/auction/list" target="_blank" data-n="小移环保拍卖 xiaoyihuanbao"><div class="stars">★★★</div><div class="card-name">小移环保拍卖</div><div class="card-url">paimai.xiaoyihuanbao.com</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">中国移动退役设备</span></div><div class="card-tags"><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.jupai.net/corporeList.html" target="_blank" data-n="聚拍网 jupai"><div class="stars">★★</div><div class="card-name">聚拍网</div><div class="card-url">jupai.net</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">大企业废旧物资拍卖</span></div><div class="card-tags"><span class="tag">废料</span><span class="tag">公交</span></div></a>
+    <a class="card" href="https://www.feijiu.net/gonggao/" target="_blank" data-n="废旧网 feijiu"><div class="stars">★★</div><div class="card-name">废旧网</div><div class="card-url">feijiu.net</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">废旧物资交易平台</span></div><div class="card-tags"><span class="tag">废料</span><span class="tag">电池</span></div></a>
+    <a class="card" href="https://www.lihuitong.net" target="_blank" data-n="锂汇通 lihuitong"><div class="stars">★★</div><div class="card-name">锂汇通</div><div class="card-url">lihuitong.net</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">锂电池专业交易平台</span></div><div class="card-tags"><span class="tag">废料</span><span class="tag">电池</span></div></a>
+    <a class="card" href="https://da.fengj.com/Province/fjwz/a3b0c0d1e1/" target="_blank" data-n="风机网资产处置 fengj"><div class="stars">★</div><div class="card-name">风机网·资产处置</div><div class="card-url">da.fengj.com</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">网优处置平台</span></div><div class="card-tags"><span class="tag">废料</span></div></a>
+    <a class="card" href="https://www.fzdpm.com/notice.html" target="_blank" data-n="广东福中达拍卖 fzdpm"><div class="stars">★</div><div class="card-name">广东福中达拍卖</div><div class="card-url">fzdpm.com</div><div class="card-foot"><span class="dot d-v"></span><span class="card-note">拍卖行网站</span></div><div class="card-tags"><span class="tag">整车</span></div></a>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- 右侧关键词速查 -->
+<div class="sidebar">
+  <div class="kw-panel">
+    <div class="kw-hd">关键词速查</div>
+
+    <div class="kw-g">
+      <div class="kw-gt">✓ 电池包 / 废料</div>
+      <div class="kw-pills">
+        <span class="kw-pill">动力电池包</span><span class="kw-pill">动力电池</span>
+        <span class="kw-pill">废旧动力电池</span><span class="kw-pill">退役动力电池</span>
+        <span class="kw-pill">电池组</span><span class="kw-pill">电池包</span>
+        <span class="kw-pill">磷酸铁锂</span><span class="kw-pill">三元锂</span>
+        <span class="kw-pill">电芯</span><span class="kw-pill">储能电池</span>
+        <span class="kw-pill">储能电芯</span><span class="kw-pill">锂电池废料</span>
+      </div>
+    </div>
+
+    <div class="kw-g">
+      <div class="kw-gt">✓ 整车 / 公交</div>
+      <div class="kw-pills">
+        <span class="kw-pill">纯电动公交车</span><span class="kw-pill">电动公交</span>
+        <span class="kw-pill">批量新能源汽车</span><span class="kw-pill">报废新能源</span>
+        <span class="kw-pill">新能源报废</span>
+      </div>
+    </div>
+
+    <div class="kw-g">
+      <div class="kw-gt">✓ 批量标记</div>
+      <div class="kw-pills">
+        <span class="kw-pill">批量</span><span class="kw-pill">一批</span>
+        <span class="kw-pill">整体打包</span><span class="kw-pill">打包处置</span>
+        <span class="kw-pill">整批</span><span class="kw-pill">X辆/组/吨/套/个</span>
+        <span class="kw-pill">XX kWh</span>
+      </div>
+    </div>
+
+    <div class="kw-g">
+      <div class="kw-gt">✕ 负向过滤（自动排除）</div>
+      <div class="kw-pills">
+        <span class="kw-pill neg">铅酸电池</span><span class="kw-pill neg">手机电池</span>
+        <span class="kw-pill neg">笔记本电池</span><span class="kw-pill neg">玩具电池</span>
+        <span class="kw-pill neg">电动车电瓶</span><span class="kw-pill neg">UPS电池</span>
+        <span class="kw-pill neg">单车</span><span class="kw-pill neg">个人</span>
+        <span class="kw-pill neg">二手</span><span class="kw-pill neg">专利</span>
+      </div>
+    </div>
+
+    <div class="kw-g">
+      <div class="kw-gt">品类分类规则</div>
+      <div class="kw-note">
+        <div>🔵 <b>锂电池废料</b>：废料/黑粉/极片/正负极废料</div>
+        <div>🟢 <b>电池包</b>：电池包/模组/动力电池/电芯/磷酸铁锂/三元锂/储能</div>
+        <div>🟡 <b>公交客车</b>：公交车/客车/大巴/电动公交</div>
+        <div>🟠 <b>新能源整车</b>：新能源汽车/纯电动/插电/PHEV/BEV</div>
+        <div style="margin-top:4px;font-size:10px;color:#bbb">优先级：废料 > 电池包 > 公交 > 整车</div>
+      </div>
+    </div>
+
+    <div class="kw-g">
+      <div class="kw-gt">平台专属搜索词</div>
+      <div class="kw-note">
+        <div><b>中国铁塔</b>：退役锂电池 / 基站电池</div>
+        <div><b>小移环保</b>：废旧锂电池 / 基站电池</div>
+        <div><b>广州产权</b>：进废电池专栏，全量</div>
+        <div><b>合肥产权废旧设备</b>：进专栏，全量</div>
+        <div><b>电池之家</b>：全站都是电池，无需搜索</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div><!-- /layout -->
+</div><!-- /wrap -->
+
+<script>
+  const d=new Date();
+  document.getElementById('dt').textContent=`今天 ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  function filter(v){v=v.toLowerCase();document.querySelectorAll('.card').forEach(c=>{c.classList.toggle('hidden',v&&!c.dataset.n.toLowerCase().includes(v))})}
+  function openSec(id){
+    let cards=id==='all'?[...document.querySelectorAll('.card:not(.hidden)')]:[...document.querySelectorAll(`#${id} .card:not(.hidden)`)];
+    if(cards.length>8&&!confirm(`将打开 ${cards.length} 个标签页，确认？`))return;
+    cards.forEach(c=>window.open(c.href,'_blank'));
+  }
+</script>
+</body>
+</html>

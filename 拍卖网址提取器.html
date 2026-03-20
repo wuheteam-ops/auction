@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="拍卖提取">
+<title>拍卖网址提取器</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,system-ui,sans-serif;background:#f2f2f7;color:#1c1c1e;min-height:100vh}
+  .header{background:#fff;padding:14px 16px 12px;border-bottom:0.5px solid #c6c6c8;position:sticky;top:0;z-index:100}
+  .header h1{font-size:17px;font-weight:600}
+  .header-sub{font-size:12px;color:#8e8e93;margin-top:2px}
+  .tab-bar{display:flex;margin-top:10px;background:#e5e5ea;border-radius:9px;padding:2px}
+  .tab{flex:1;text-align:center;padding:6px 0;font-size:13px;font-weight:500;border-radius:7px;cursor:pointer;color:#8e8e93;border:none;background:none;font-family:inherit;transition:all .15s}
+  .tab.active{background:#fff;color:#1c1c1e;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  .page{display:none;padding-bottom:30px}
+  .page.active{display:block}
+
+  /* 提取页 */
+  .input-section{margin:12px 16px 0;background:#fff;border-radius:14px;padding:14px 15px}
+  .input-label{font-size:13px;font-weight:500;color:#1c1c1e;margin-bottom:8px}
+  .url-input{width:100%;border:1px solid #e5e5ea;border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;color:#1c1c1e;background:#f2f2f7;resize:none;min-height:80px;line-height:1.5}
+  .url-input:focus{border-color:#007aff;background:#fff}
+  .url-input::placeholder{color:#c7c7cc}
+  .input-hint{font-size:12px;color:#8e8e93;margin-top:6px;line-height:1.5}
+
+  .extract-btn{display:block;margin:10px 16px 0;background:#007aff;color:#fff;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:600;cursor:pointer;width:calc(100% - 32px);font-family:inherit}
+  .extract-btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .loading{margin:10px 16px 0;background:#fff;border-radius:14px;padding:22px;text-align:center;display:none}
+  .spin{width:30px;height:30px;border:3px solid #e5e5ea;border-top-color:#007aff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading p{font-size:13px;color:#8e8e93}
+
+  .error-box{margin:10px 16px 0;background:#fff5f5;border:1px solid #ffcccc;border-radius:12px;padding:12px 14px;display:none}
+  .error-box p{font-size:13px;color:#cc0000;line-height:1.5}
+
+  .result-area{margin:10px 16px 0;display:none}
+  .result-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .result-hd-title{font-size:13px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.05em}
+  .result-btns{display:flex;gap:10px}
+  .result-btn{background:none;border:none;color:#007aff;font-size:13px;cursor:pointer;font-family:inherit}
+
+  .summary-card{background:#fff;border-radius:14px;padding:13px 15px;margin-bottom:8px}
+  .summary-platform{font-size:13px;color:#3c3c43;margin-bottom:3px}
+  .summary-platform b{color:#1c1c1e}
+  .summary-text{font-size:13px;color:#3c3c43;line-height:1.5}
+  .summary-count{font-size:13px;color:#3c3c43;margin-top:3px}
+  .summary-count b{color:#007aff}
+
+  .lot-list{display:flex;flex-direction:column;gap:8px}
+  .lot-card{background:#fff;border-radius:14px;padding:14px 15px}
+  .lot-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .lot-name{font-size:14px;font-weight:600;color:#1c1c1e;line-height:1.4;flex:1}
+  .lot-status{font-size:11px;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;font-weight:500}
+  .s-active{background:#e8f8ee;color:#1a7f3c}
+  .s-soon{background:#fff3e0;color:#b45309}
+  .s-end{background:#f2f2f7;color:#8e8e93}
+  .lot-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .lot-field{background:#f2f2f7;border-radius:8px;padding:7px 9px}
+  .lot-field.full{grid-column:1/-1}
+  .lf-label{font-size:10px;color:#8e8e93;margin-bottom:1px}
+  .lf-value{font-size:13px;font-weight:500;color:#1c1c1e;word-break:break-all;line-height:1.4}
+  .lf-value.price{color:#ff3b30}
+  .lot-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+  .lot-tag{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:500}
+  .lt-batch{background:#fff3e0;color:#b45309}
+  .lt-scrap{background:#f3e5f5;color:#7b1fa2}
+  .lt-battery{background:#e3f2fd;color:#1565c0}
+
+  /* 历史 */
+  .hist-empty{padding:40px 20px;text-align:center}
+  .hist-empty p{font-size:14px;color:#8e8e93;line-height:1.8}
+  .hist-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
+  .hist-hd-title{font-size:13px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.05em}
+  .hist-clear{background:none;border:none;color:#ff3b30;font-size:13px;cursor:pointer;font-family:inherit}
+  .hist-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+  .hist-item{background:#fff;border-radius:14px;overflow:hidden}
+  .hist-item-hd{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+  .hist-item-info{flex:1;min-width:0}
+  .hist-item-title{font-size:14px;font-weight:500;color:#1c1c1e;margin-bottom:2px}
+  .hist-item-meta{font-size:11px;color:#8e8e93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist-item-arrow{color:#c7c7cc;font-size:16px;flex-shrink:0;transition:transform .2s}
+  .hist-item-hd.open .hist-item-arrow{transform:rotate(90deg)}
+  .hist-item-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .hist-item-body.open{max-height:2000px}
+  .hist-item-lots{padding:0 14px 12px;display:flex;flex-direction:column;gap:6px}
+  .hist-lot{background:#f2f2f7;border-radius:10px;padding:10px 12px}
+  .hist-lot-name{font-size:13px;font-weight:500;color:#1c1c1e;margin-bottom:3px;line-height:1.3}
+  .hist-lot-row{font-size:12px;color:#3c3c43;line-height:1.7}
+  .hist-lot-price{color:#ff3b30;font-weight:500}
+  .hist-del{background:none;border:none;color:#ff3b30;font-size:12px;cursor:pointer;font-family:inherit;padding:8px 14px;border-top:0.5px solid #f2f2f7;width:100%;text-align:center}
+
+  /* 设置 */
+  .settings-section{margin:12px 16px 0;background:#fff;border-radius:14px;overflow:hidden}
+  .settings-row{padding:13px 15px;border-bottom:0.5px solid #f2f2f7;display:flex;flex-direction:column;gap:6px}
+  .settings-row:last-child{border-bottom:none}
+  .settings-label{font-size:13px;font-weight:500;color:#1c1c1e}
+  .settings-sub{font-size:12px;color:#8e8e93;line-height:1.5}
+  .settings-input{border:1px solid #e5e5ea;border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;outline:none;background:#f2f2f7;color:#1c1c1e;width:100%}
+  .settings-input:focus{border-color:#007aff;background:#fff}
+  .settings-save-btn{background:#007aff;color:#fff;border:none;border-radius:9px;padding:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;width:100%}
+  .settings-hint{margin:8px 16px 0;font-size:12px;color:#8e8e93;line-height:1.7;padding:0 2px}
+
+  .apikey-warn{margin:12px 16px 0;background:#fff3cd;border:1px solid #ffc107;border-radius:12px;padding:11px 14px;display:none}
+  .apikey-warn p{font-size:13px;color:#856404;margin-bottom:8px}
+  .apikey-warn button{background:#007aff;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🔗 拍卖网址提取器</h1>
+  <div class="header-sub">粘贴网址 → AI提取标的信息 → 存档</div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('extract')">提取</button>
+    <button class="tab" onclick="switchTab('history')">历史 <span id="histCount"></span></button>
+    <button class="tab" onclick="switchTab('settings')">设置</button>
+  </div>
+</div>
+
+<div class="apikey-warn" id="apikeyWarn">
+  <p>⚠️ 还没有设置 API Key，请先去设置页面填写。</p>
+  <button onclick="switchTab('settings')">去设置 →</button>
+</div>
+
+<!-- 提取页 -->
+<div class="page active" id="page-extract">
+  <div class="input-section">
+    <div class="input-label">粘贴拍卖页面网址</div>
+    <textarea class="url-input" id="urlInput" placeholder="粘贴一个或多个网址，每行一个&#10;&#10;例如：&#10;https://new.gemas.com.cn/trade/detail/xxx&#10;https://paimai.caa123.org.cn/procurement/detail/xxx" rows="4"></textarea>
+    <div class="input-hint">支持任意拍卖平台详情页或列表页网址</div>
+  </div>
+  <button class="extract-btn" id="extractBtn" onclick="extract()">🔍 提取标的信息</button>
+  <div class="loading" id="loading"><div class="spin"></div><p id="loadingText">AI 正在读取页面内容...</p></div>
+  <div class="error-box" id="errorBox"><p id="errorText"></p></div>
+  <div class="result-area" id="resultArea">
+    <div class="result-hd">
+      <span class="result-hd-title">提取结果</span>
+      <div class="result-btns">
+        <button class="result-btn" onclick="copyResult()">复制</button>
+        <button class="result-btn" onclick="saveResult()">存档</button>
+      </div>
+    </div>
+    <div id="resultContent"></div>
+  </div>
+</div>
+
+<!-- 历史 -->
+<div class="page" id="page-history">
+  <div id="histContent"></div>
+</div>
+
+<!-- 设置 -->
+<div class="page" id="page-settings">
+  <div class="settings-section">
+    <div class="settings-row">
+      <div class="settings-label">豆包 API Key</div>
+      <div class="settings-sub">火山引擎控制台 → 火山方舟 → API Key 管理</div>
+      <input class="settings-input" type="password" id="keyInput" placeholder="填入 API Key..." autocomplete="off">
+    </div>
+    <div class="settings-row">
+      <div class="settings-label">Endpoint ID</div>
+      <div class="settings-sub">火山方舟 → 推理接入点 → 创建（选 doubao-vision-pro-32k）→ 复制 ID</div>
+      <input class="settings-input" type="text" id="endpointInput" placeholder="ep-xxxxxxxxxx-xxxxx">
+      <button class="settings-save-btn" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+  <div class="settings-hint">
+    获取步骤：<br>
+    1. console.volcengine.com 注册登录<br>
+    2. 火山方舟 → API Key 管理 → 创建 Key<br>
+    3. 推理接入点 → 创建接入点 → 选 doubao-pro-32k → 复制 ID<br>
+    4. 填入上方保存
+  </div>
+</div>
+
+<script>
+let lastParsed = null;
+
+function getKey(){return localStorage.getItem('dbApiKey')||'';}
+function getEndpoint(){return localStorage.getItem('dbEndpoint')||'';}
+
+function checkKey(){
+  const ok = getKey() && getEndpoint();
+  document.getElementById('apikeyWarn').style.display = ok ? 'none' : 'block';
+  if(getKey()) document.getElementById('keyInput').value = getKey();
+  if(getEndpoint()) document.getElementById('endpointInput').value = getEndpoint();
+}
+
+function saveSettings(){
+  const k = document.getElementById('keyInput').value.trim();
+  const e = document.getElementById('endpointInput').value.trim();
+  if(!k||!e){alert('两项都要填');return;}
+  localStorage.setItem('dbApiKey',k);
+  localStorage.setItem('dbEndpoint',e);
+  checkKey();
+  alert('✅ 保存成功');
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['extract','history','settings'][i]===t));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+t).classList.add('active');
+  if(t==='history') renderHistory();
+}
+
+async function extract(){
+  const key=getKey(), endpoint=getEndpoint();
+  if(!key||!endpoint){switchTab('settings');return;}
+
+  const raw = document.getElementById('urlInput').value.trim();
+  if(!raw){alert('请先粘贴网址');return;}
+
+  const urls = raw.split('\n').map(u=>u.trim()).filter(u=>u.startsWith('http'));
+  if(!urls.length){alert('请输入有效的 http 开头的网址');return;}
+
+  document.getElementById('loading').style.display='block';
+  document.getElementById('extractBtn').disabled=true;
+  document.getElementById('resultArea').style.display='none';
+  document.getElementById('errorBox').style.display='none';
+
+  const urlList = urls.map((u,i)=>`${i+1}. ${u}`).join('\n');
+  document.getElementById('loadingText').textContent = `AI 正在读取 ${urls.length} 个页面...`;
+
+  const prompt = `请访问以下拍卖平台网址，提取每个页面中的标的（拍卖项目）信息：
+
+${urlList}
+
+对每个网址，尽量提取：
+- 标的名称
+- 起拍价/挂牌价
+- 竞价状态（竞价中/报名中/预告中/已结束）
+- 截止时间
+- 平台名称
+- 联系方式（电话/联系人）
+- 地区
+- 数量/批次
+- 其他重要信息
+
+返回JSON格式：
+{
+  "results": [
+    {
+      "url": "网址",
+      "platform": "平台名",
+      "lots": [
+        {"name":"","price":"","status":"","deadline":"","location":"","contact":"","quantity":"","note":""}
+      ],
+      "summary": "一句话总结"
+    }
+  ]
+}
+
+只返回JSON，无其他文字。如果某个网址无法访问或没有标的信息，在该条的lots里返回空数组并在summary说明原因。`;
+
+  try{
+    const resp = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({
+        model: endpoint,
+        max_tokens: 3000,
+        messages:[{role:'user',content:[
+          {type:'text',text:prompt}
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error.message||'API错误');
+    const text = data.choices?.[0]?.message?.content||'';
+    let jsonStr = text.trim().replace(/^```json\s*/,'').replace(/\s*```$/,'').trim();
+    const parsed = JSON.parse(jsonStr);
+    document.getElementById('loading').style.display='none';
+    lastParsed = parsed;
+    renderResult(parsed);
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    showError('提取失败：'+e.message);
+  }
+  document.getElementById('extractBtn').disabled=false;
+}
+
+function renderResult(data){
+  const el = document.getElementById('resultContent');
+  el.innerHTML='';
+  const results = data.results||[];
+
+  results.forEach(r=>{
+    // 平台/URL 标题
+    const hd = document.createElement('div');
+    hd.className='summary-card';
+    hd.innerHTML=`
+      ${r.platform?`<div class="summary-platform">平台：<b>${r.platform}</b></div>`:''}
+      <div class="summary-text" style="color:#8e8e93;font-size:11px;word-break:break-all;margin-bottom:4px">${r.url}</div>
+      ${r.summary?`<div class="summary-text">${r.summary}</div>`:''}
+      ${r.lots&&r.lots.length?`<div class="summary-count">识别到 <b>${r.lots.length}</b> 条标的</div>`:''}
+    `;
+    el.appendChild(hd);
+
+    (r.lots||[]).forEach((lot,i)=>{
+      const card = document.createElement('div');
+      card.className='lot-card';
+      const sc = lot.status&&(lot.status.includes('竞价')||lot.status.includes('进行'))?'s-active':
+                 lot.status&&(lot.status.includes('报名')||lot.status.includes('预告'))?'s-soon':'s-end';
+      const isBatch=/批量|一批|整批|打包|\d+辆|\d+组|\d+吨/.test((lot.name||'')+(lot.quantity||''));
+      const isScrap=/废料|黑粉|极片|废旧/.test(lot.name||'');
+      const isBattery=/电池|电芯|磷酸铁锂|三元锂|储能/.test(lot.name||'');
+      const tags=(isBatch?'<span class="lot-tag lt-batch">批量</span>':'')
+               +(isScrap?'<span class="lot-tag lt-scrap">废料</span>':'')
+               +(isBattery&&!isScrap?'<span class="lot-tag lt-battery">电池</span>':'');
+      card.innerHTML=`
+        <div class="lot-card-hd">
+          <div class="lot-name">${i+1}. ${lot.name||'未识别'}</div>
+          ${lot.status?`<span class="lot-status ${sc}">${lot.status}</span>`:''}
+        </div>
+        <div class="lot-grid">
+          ${lot.price&&lot.price!=='未知'?`<div class="lot-field"><div class="lf-label">起拍价</div><div class="lf-value price">${lot.price}</div></div>`:''}
+          ${lot.deadline?`<div class="lot-field"><div class="lf-label">截止时间</div><div class="lf-value">${lot.deadline}</div></div>`:''}
+          ${lot.location?`<div class="lot-field"><div class="lf-label">地区</div><div class="lf-value">${lot.location}</div></div>`:''}
+          ${lot.contact?`<div class="lot-field"><div class="lf-label">联系方式</div><div class="lf-value">${lot.contact}</div></div>`:''}
+          ${lot.quantity?`<div class="lot-field"><div class="lf-label">数量</div><div class="lf-value">${lot.quantity}</div></div>`:''}
+          ${lot.note?`<div class="lot-field full"><div class="lf-label">备注</div><div class="lf-value">${lot.note}</div></div>`:''}
+        </div>
+        ${tags?`<div class="lot-tags">${tags}</div>`:''}
+      `;
+      el.appendChild(card);
+    });
+  });
+
+  document.getElementById('resultArea').style.display='block';
+}
+
+function showError(msg){
+  document.getElementById('errorText').textContent=msg;
+  document.getElementById('errorBox').style.display='block';
+}
+
+function copyResult(){
+  if(!lastParsed)return;
+  let t='';
+  (lastParsed.results||[]).forEach(r=>{
+    t+=`【${r.platform||r.url}】\n`;
+    if(r.summary) t+=r.summary+'\n';
+    (r.lots||[]).forEach((l,i)=>{
+      t+=`${i+1}. ${l.name}\n`;
+      if(l.price&&l.price!=='未知') t+=`   价格：${l.price}\n`;
+      if(l.status) t+=`   状态：${l.status}\n`;
+      if(l.deadline) t+=`   截止：${l.deadline}\n`;
+      if(l.contact) t+=`   联系：${l.contact}\n`;
+      if(l.note) t+=`   备注：${l.note}\n`;
+      t+='\n';
+    });
+  });
+  navigator.clipboard.writeText(t.trim()).then(()=>{
+    const btn=document.querySelectorAll('.result-btn')[0];
+    btn.textContent='已复制 ✓';setTimeout(()=>btn.textContent='复制',2000);
+  });
+}
+
+function saveResult(){
+  if(!lastParsed)return;
+  const records=JSON.parse(localStorage.getItem('extractRecords')||'[]');
+  const first=lastParsed.results?.[0];
+  records.unshift({
+    id:Date.now(),
+    time:new Date().toLocaleString('zh-CN'),
+    platform:first?.platform||'未知平台',
+    summary:first?.summary||'',
+    url:first?.url||'',
+    results:lastParsed.results||[]
+  });
+  localStorage.setItem('extractRecords',JSON.stringify(records.slice(0,100)));
+  updateHistCount();
+  const btn=document.querySelectorAll('.result-btn')[1];
+  btn.textContent='已存档 ✓';setTimeout(()=>btn.textContent='存档',2000);
+}
+
+function updateHistCount(){
+  const n=JSON.parse(localStorage.getItem('extractRecords')||'[]').length;
+  document.getElementById('histCount').textContent=n>0?`(${n})`:'';
+}
+
+function renderHistory(){
+  const records=JSON.parse(localStorage.getItem('extractRecords')||'[]');
+  const el=document.getElementById('histContent');
+  if(!records.length){
+    el.innerHTML='<div class="hist-empty"><p>暂无存档记录<br>提取完成后点「存档」保存</p></div>';
+    return;
+  }
+  el.innerHTML=`<div class="hist-hd"><span class="hist-hd-title">存档（${records.length}条）</span><button class="hist-clear" onclick="clearHistory()">全部清除</button></div><div class="hist-list" id="histList"></div>`;
+  const list=document.getElementById('histList');
+  records.forEach(rec=>{
+    const total=(rec.results||[]).reduce((s,r)=>s+(r.lots||[]).length,0);
+    const item=document.createElement('div');item.className='hist-item';
+    item.innerHTML=`
+      <button class="hist-item-hd" onclick="toggleHist(this)">
+        <div class="hist-item-info">
+          <div class="hist-item-title">${rec.platform} · ${total}条标的</div>
+          <div class="hist-item-meta">${rec.time} ${rec.summary?'  '+rec.summary.slice(0,25):''}</div>
+        </div>
+        <span class="hist-item-arrow">›</span>
+      </button>
+      <div class="hist-item-body">
+        <div class="hist-item-lots">
+          ${(rec.results||[]).flatMap((r,ri)=>(r.lots||[]).map((l,i)=>`
+            <div class="hist-lot">
+              <div class="hist-lot-name">${i+1}. ${l.name||'未知'}</div>
+              <div class="hist-lot-row">${l.price&&l.price!=='未知'?`<span class="hist-lot-price">${l.price}</span>  `:''}${l.status?l.status+'  ':''}${l.deadline?'截止 '+l.deadline:''}</div>
+              ${l.contact?`<div class="hist-lot-row" style="color:#8e8e93">${l.contact}</div>`:''}
+            </div>
+          `)).join('')}
+        </div>
+        <button class="hist-del" onclick="deleteRecord(${rec.id})">删除此条</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function toggleHist(btn){btn.classList.toggle('open');btn.nextElementSibling.classList.toggle('open');}
+function clearHistory(){if(!confirm('确认清除全部？'))return;localStorage.removeItem('extractRecords');updateHistCount();renderHistory();}
+function deleteRecord(id){let r=JSON.parse(localStorage.getItem('extractRecords')||'[]');r=r.filter(x=>x.id!==id);localStorage.setItem('extractRecords',JSON.stringify(r));updateHistCount();renderHistory();}
+
+checkKey();updateHistCount();
+</script>
+</body>
+</html>
