@@ -122,7 +122,7 @@
 </div>
 
 <div class="apikey-warn" id="apikeyWarn">
-  <p>⚠️ 还没有设置 API Key，请先去设置页面填写。</p>
+  <p>⚠️ 还没有设置 Kimi API Key，请先去设置页面填写。</p>
   <button onclick="switchTab('settings')">去设置 →</button>
 </div>
 
@@ -157,23 +157,19 @@
 <div class="page" id="page-settings">
   <div class="settings-section">
     <div class="settings-row">
-      <div class="settings-label">豆包 API Key</div>
-      <div class="settings-sub">火山引擎控制台 → 火山方舟 → API Key 管理</div>
+      <div class="settings-label">Kimi API Key</div>
+      <div class="settings-sub">Kimi 开放平台：platform.moonshot.cn</div>
       <input class="settings-input" type="password" id="keyInput" placeholder="填入 API Key..." autocomplete="off">
     </div>
     <div class="settings-row">
-      <div class="settings-label">Endpoint ID</div>
-      <div class="settings-sub">火山方舟 → 推理接入点 → 创建（选 doubao-vision-pro-32k）→ 复制 ID</div>
-      <input class="settings-input" type="text" id="endpointInput" placeholder="ep-xxxxxxxxxx-xxxxx">
       <button class="settings-save-btn" onclick="saveSettings()">保存</button>
     </div>
   </div>
   <div class="settings-hint">
     获取步骤：<br>
-    1. console.volcengine.com 注册登录<br>
-    2. 火山方舟 → API Key 管理 → 创建 Key<br>
-    3. 推理接入点 → 创建接入点 → 选 doubao-pro-32k → 复制 ID<br>
-    4. 填入上方保存
+    1. 打开 platform.moonshot.cn 注册登录<br>
+    2. 左侧「API Key」→「新建 API Key」→ 复制<br>
+    3. 填入上方保存
   </div>
 </div>
 
@@ -184,7 +180,7 @@ function getKey(){return localStorage.getItem('dbApiKey')||'';}
 function getEndpoint(){return localStorage.getItem('dbEndpoint')||'';}
 
 function checkKey(){
-  const ok = getKey() && getEndpoint();
+  const ok = !!getKey();
   document.getElementById('apikeyWarn').style.display = ok ? 'none' : 'block';
   if(getKey()) document.getElementById('keyInput').value = getKey();
   if(getEndpoint()) document.getElementById('endpointInput').value = getEndpoint();
@@ -192,10 +188,8 @@ function checkKey(){
 
 function saveSettings(){
   const k = document.getElementById('keyInput').value.trim();
-  const e = document.getElementById('endpointInput').value.trim();
-  if(!k||!e){alert('两项都要填');return;}
+  if(!k){alert('请填入 API Key');return;}
   localStorage.setItem('dbApiKey',k);
-  localStorage.setItem('dbEndpoint',e);
   checkKey();
   alert('✅ 保存成功');
 }
@@ -208,8 +202,8 @@ function switchTab(t){
 }
 
 async function extract(){
-  const key=getKey(), endpoint=getEndpoint();
-  if(!key||!endpoint){switchTab('settings');return;}
+  const key=getKey();
+  if(!key){switchTab('settings');return;}
 
   const raw = document.getElementById('urlInput').value.trim();
   if(!raw){alert('请先粘贴网址');return;}
@@ -257,11 +251,11 @@ ${urlList}
 只返回JSON，无其他文字。如果某个网址无法访问或没有标的信息，在该条的lots里返回空数组并在summary说明原因。`;
 
   try{
-    const resp = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions',{
+    const resp = await fetch('https://api.moonshot.cn/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body:JSON.stringify({
-        model: endpoint,
+        model: 'moonshot-v1-32k',
         max_tokens: 3000,
         messages:[{role:'user',content:[
           {type:'text',text:prompt}
